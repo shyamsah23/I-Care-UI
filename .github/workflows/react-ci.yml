@@ -1,0 +1,38 @@
+name: 🧪 React CI - Build Check
+
+on:
+  pull_request:        # ✅ runs on every PR
+    branches:
+      - main
+      - develop
+  push:                # (optional) also runs on push
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛠️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20   # or whatever version you’re using
+
+      - name: 📦 Install dependencies
+        run: npm ci          # faster & cleaner than npm install
+
+      - name: 🧱 Build React app
+        run: npm run build   # will fail if any UI/build error exists
+
+      - name: ✅ Success Message
+        if: success()
+        run: echo "React UI built successfully — No errors found! 🎉"
+
+      - name: ❌ Failure Message
+        if: failure()
+        run: echo "React UI build failed. Please fix errors before merging! 🚨"
