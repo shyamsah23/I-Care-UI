@@ -15,7 +15,7 @@ import {
 import { Link } from "react-router-dom";
 
 export default function Signup() {
-  const [userData, setUserData] = useState({ email: "", password: "", role:"",username:"", phoneNo:"",confirmPassword:""});
+  const [userData, setUserData] = useState({ email: "", password: "", role:"",username:"", phoneNo:"0",confirmPassword:""});
   const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false });
   const email_regex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   const password_regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
