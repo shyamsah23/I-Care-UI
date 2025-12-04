@@ -1,40 +1,47 @@
-import { useEffect, useState } from "react";
-import {
-  Paper,
-  TextInput,
-  PasswordInput,
-  Select,
-  Checkbox,
-  Button,
-  Title,
-  Text,
-  Group,
-  Stack
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useState } from "react";
+import {Paper,TextInput,PasswordInput,Select,Checkbox,Button,Title,Text,Group,Stack} from "@mantine/core";
 import { Link } from "react-router-dom";
+import axios from "redaxios";
+// const axios = require('axios').default;
+
+// axios.<method> will now provide autocomplete and parameter typings
+
+// const axios = require("axios").default;
 
 export default function Login() {
  
-  const [userData, setUserData] = useState({ email: "", password: "", role:""});
-  const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false });
-  const email_regex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-  const password_regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
+  const [userData, setUserData] = useState({ username: "", password: "", role: "DOCTOR" });
+  
+  // const HandleUserLogin = async () => {
+  //   console.log("calling login user api from backend");
+  //   const data = await axios.post(
+  //     "http://localhost:8081/auth/user/login",
+  //     {
+  //       username: userData.username,
+  //       password: userData.password,
+  //     },
+  //     {
+  //       headers: {
+  //         'x-secret-key': '987654321HEAD'
+  //       },
+  //     }
+  //   );
+  //   console.log({ data });
+  // };
 
-  const HandleSubmit = (e) => {
+  const HandleSubmit = async(e) => {
     e.preventDefault();
-    const emailCheck = email_regex.test(userData.email);
-    const passwordCheck = password_regex.test(userData.password);
-    
-    if (!emailCheck) setErrorFag((c) => ({ ...c, emailInvalid: true }));
-    else setErrorFag((c) => ({ ...c, emailInvalid: false }));
-    if (!passwordCheck) setErrorFag((c) => ({ ...c, passwordInvalid: true }));
-    else setErrorFag((c) => ({ ...c, passwordInvalid: false }));
-    if (userData.email.slice(userData.email.length - 10, userData.email.length) != "@gmail.com")
-      setErrorFag((c) => ({ ...c, emailInvalid: true }));
-
-    if (!errorFlag.emailInvalid && !errorFlag.passwordInvalid) console.log(userData);
-    setUserData({ email: "", password: "", role: ""});
+    // HandleUserLogin();
+    console.log("calling login user api from backend");
+    const data = await axios.post(
+      "http://localhost:9090/auth/user/login",
+      {
+        username: userData.username,
+        password: userData.password,
+      }
+    );
+    console.log({ data });
+    // setUserData({ username: "", password: "", role: ""});
   }
 
   return (
@@ -92,24 +99,21 @@ export default function Login() {
 
         <Stack gap="sm">
           <TextInput
-            label="Email"
-            placeholder="JohnDoe@gmail.com"
+            label="Username"
+            placeholder="JohnDoe@123"
             required
-            value={userData.email}
+            value={userData.username}
             onChange={(e) =>
-              setUserData((c)=>({ ...c, email: e.target.value }))
+              setUserData((c)=>({ ...c, username: e.target.value }))
             }
             radius="md"
             styles={{
               input: {
                 backgroundColor: "rgba(15,23,42,0.9)",
-                
+                color: "white",
               },
             }}
           />
-          {errorFlag.emailInvalid==true&&<div className="text-xs text-red-500">
-            * Invalid email
-          </div>}
 
           <PasswordInput
             label="Password"
@@ -127,9 +131,6 @@ export default function Login() {
               },
             }}
           />
-          {errorFlag.passwordInvalid && <div className="text-xs text-red-500">
-            * Include atleast one character each from [a-z]& [A-Z]& [0-9]
-          </div>}
 
           <Select
             label="Role"
