@@ -1,4 +1,3 @@
-// src/pages/Signup.jsx
 import React, { useState } from "react";
 import {
   Paper,
@@ -8,18 +7,21 @@ import {
   Button,
   Title,
   Text,
-  Group,
   Stack,
   SimpleGrid,
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 
 export default function Signup() {
-  const [userData, setUserData] = useState({ email: "", password: "", role:"",username:"", phoneNo:"",confirmPassword:""});
-  const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false });
+  const [userData, setUserData] = useState({ email: "", password: "", role:"PATIENT",username:"", phoneNo:"0",confirmPassword:""});
+  const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false, passwordMismatch:false });
   const email_regex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   const password_regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
-
+  
+  const HandlePasswordCheck = () => {
+    (userData.password != userData.confirmPassword) ?
+      setErrorFag((c) => ({ ...c, passwordMismatch: true })) : setErrorFag((c) => ({ ...c, passwordMismatch: false }));
+  }
   const HandleSubmit = (e) => {
     e.preventDefault();
     const emailCheck = email_regex.test(userData.email);
@@ -33,9 +35,10 @@ export default function Signup() {
       setErrorFag((c) => ({ ...c, emailInvalid: true }));
 
     if (!userData.username&&!errorFlag.emailInvalid) setUserData({ ...userData, username: userData.email.slice(0, userData.email.length - 10) });
+    HandlePasswordCheck();
 
     if (!errorFlag.emailInvalid && !errorFlag.passwordInvalid) console.log(userData);
-    setUserData({ email: "", password: "", role: "", username: "",phoneNo:"",confirmPassword:"" });
+    // setUserData({ email: "", password: "", role: "", username: "",phoneNo:"",confirmPassword:"" });
   }
   return (
     <div
@@ -107,29 +110,27 @@ export default function Signup() {
             }}
           />
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-            <div>
-              <TextInput
-                label="Email"
-                placeholder="you@hospital.com"
-                required
-                value={userData.email}
-                onChange={(e) => {
-                  setUserData((c) => ({ ...c, email: e.target.value }));
-                }}
-                radius="md"
-                styles={{
-                  input: {
-                    backgroundColor: "rgba(15,23,42,0.9)",
-                    color: "white",
-                  },
-                }}
-              />
-              {errorFlag.emailInvalid == true && (
-                <div className="text-xs text-red-500 pt-1">* Invalid email</div>
-              )}
-            </div>
+          <TextInput
+            label="Email"
+            placeholder="you@hospital.com"
+            required
+            value={userData.email}
+            onChange={(e) => {
+              setUserData((c) => ({ ...c, email: e.target.value }));
+            }}
+            radius="md"
+            styles={{
+              input: {
+                backgroundColor: "rgba(15,23,42,0.9)",
+                color: "white",
+              },
+            }}
+          />
+          {errorFlag.emailInvalid == true && (
+            <div className="text-xs text-red-500 pt-1">* Invalid email</div>
+          )}
 
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             <TextInput
               label="Phone"
               placeholder="+91 98765 43210"
@@ -145,9 +146,7 @@ export default function Signup() {
                 },
               }}
             />
-          </SimpleGrid>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             <Select
               label="Role"
               placeholder="Select role"
@@ -177,33 +176,15 @@ export default function Signup() {
                 },
               }}
             />
-
-            <PasswordInput
-              label="Password"
-              placeholder="Create a strong password"
-              required
-              value={userData.password}
-              onChange={(e) => {
-                setUserData((c) => ({ ...c, password: e.target.value }));
-              }}
-              radius="md"
-              styles={{
-                input: {
-                  backgroundColor: "rgba(15,23,42,0.9)",
-                  color: "white",
-                },
-              }}
-            />
           </SimpleGrid>
 
-          <div >
           <PasswordInput
-            label="Confirm password"
-            placeholder="Repeat password"
+            label="Password"
+            placeholder="Create a strong password"
             required
-            value={userData.confirmPassword}
+            value={userData.password}
             onChange={(e) => {
-              setUserData((c) => ({ ...c, confirmPassword: e.target.value }));
+              setUserData((c) => ({ ...c, password: e.target.value }));
             }}
             radius="md"
             styles={{
@@ -218,6 +199,29 @@ export default function Signup() {
               * Include atleast one character each from [a-z]& [A-Z]& [0-9]
             </div>
           )}
+
+          <div>
+            <PasswordInput
+              label="Confirm password"
+              placeholder="Repeat password"
+              required
+              value={userData.confirmPassword}
+              onChange={(e) => {
+                setUserData((c) => ({ ...c, confirmPassword: e.target.value }));
+              }}
+              radius="md"
+              styles={{
+                input: {
+                  backgroundColor: "rgba(15,23,42,0.9)",
+                  color: "white",
+                },
+              }}
+            />
+            {errorFlag.passwordMismatch && !errorFlag.passwordInvalid && (
+              <div className="text-xs text-red-500 pt-1">
+                * PasswordMismatch
+              </div>
+            )}
           </div>
           <Button
             type="submit"
