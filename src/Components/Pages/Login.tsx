@@ -1,12 +1,8 @@
 import { useState } from "react";
 import {Paper,TextInput,PasswordInput,Select,Checkbox,Button,Title,Text,Group,Stack} from "@mantine/core";
 import { Link } from "react-router-dom";
-import axios from "redaxios";
-// const axios = require('axios').default;
+import loginUser from "../../Services/UserService";
 
-// axios.<method> will now provide autocomplete and parameter typings
-
-// const axios = require("axios").default;
 
 export default function Login() {
  
@@ -28,21 +24,22 @@ export default function Login() {
   //   );
   //   console.log({ data });
   // };
+  
 
-  const HandleSubmit = async(e) => {
+  const HandleSubmit = async (e) => {
     e.preventDefault();
-    // HandleUserLogin();
-    console.log("calling login user api from backend");
-    const data = await axios.post(
-      "http://localhost:9090/auth/user/login",
-      {
+
+    try {
+      const response = await loginUser({
         username: userData.username,
         password: userData.password,
-      }
-    );
-    console.log({ data });
-    // setUserData({ username: "", password: "", role: ""});
-  }
+      });
+
+      console.log("Login success:", response);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
 
   return (
     <div
