@@ -11,17 +11,18 @@ import {
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUserDetails } from "../../Slices/UserSlice";
-import { deleteJWTToken } from "../../Slices/JWTSlice";
+// import { deleteJWTToken } from "../../Slices/JWTSlice";
+import { deleteJWTToken } from "../../Slices/AuthSlice";
+
 
 
 
 const ProfileMenu = () => {
   const userDetails = useSelector((state: any) => state.userSlice);
-  const token = useSelector((state: any) => state.jwtSlice);
   const dispatch = useDispatch();
   useEffect(() => {
     console.log(userDetails?.decoded?.sub)
-  }, [userDetails,token])
+  }, [userDetails,])
   
   const HandleLogout = () => {
     dispatch(removeUserDetails());

@@ -4,7 +4,8 @@ import { data, Link, useNavigate } from "react-router-dom";
 import loginUser from "../../Services/UserService";
 import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
 import { useDispatch, useSelector } from "react-redux";
-import { addJWTToken, deleteJWTToken } from "../../Slices/JwtSlice";
+// import { addJWTToken, deleteJWTToken } from "../../Slices/JwtSlice";
+import { addJWTToken, deleteJWTToken } from "../../Slices/AuthSlice";
 import { jwtDecode } from 'jwt-decode';
 import { addUserDetails } from "../../Slices/UserSlice";
 
