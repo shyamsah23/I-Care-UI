@@ -1,10 +1,11 @@
-import React from 'react'
 import { IconLayoutSidebarLeftCollapseFilled,IconBellRinging } from "@tabler/icons-react";
 import { ActionIcon, Avatar } from '@mantine/core';
 import ProfileMenu from './ProfileMenu';
 import { Link } from 'react-router-dom';
+import { useSelector } from "react-redux";
 
 const Header = () => {
+  const token = useSelector((state: any) => state.jwtSlice);
   return (
     <header
       className="
@@ -55,9 +56,10 @@ const Header = () => {
       {/* Right: notification + auth buttons + profile */}
       <div className="flex items-center gap-4">
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            to="/login"
-            className="
+          {!token && (
+            <Link
+              to="/login"
+              className="
             px-4 py-1.5
             text-sm font-medium
             rounded-lg
@@ -69,13 +71,15 @@ const Header = () => {
             shadow-md hover:shadow-xl
             backdrop-blur-md
           "
-          >
-            Login
-          </Link>
+            >
+              Login
+            </Link>
+          )}
 
-          <Link
-            to="/signup"
-            className="
+          {!token && (
+            <Link
+              to="/signup"
+              className="
             px-4 py-1.5
             text-sm font-medium
             rounded-lg
@@ -87,14 +91,16 @@ const Header = () => {
             shadow-md hover:shadow-xl
             backdrop-blur-md
           "
-          >
-            Signup
-          </Link>
-          <ActionIcon
-            variant="transparent"
-            size="lg"
-            aria-label="Notifications"
-            className="
+            >
+              Signup
+            </Link>
+          )}
+          {token && (
+            <ActionIcon
+              variant="transparent"
+              size="lg"
+              aria-label="Notifications"
+              className="
           relative
           rounded-full
           bg-emerald-500/10
@@ -103,18 +109,19 @@ const Header = () => {
           border border-emerald-400/40
           transition-all duration-300
         "
-          >
-            <IconBellRinging
-              stroke={2}
-              style={{ width: "80%", height: "80%" }}
-              className="text-emerald-200 drop-shadow-[0_0_10px_rgba(45,212,191,0.9)]"
-            />
-            <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(248,113,113,0.9)]" />
-          </ActionIcon>
+            >
+              <IconBellRinging
+                stroke={2}
+                style={{ width: "80%", height: "80%" }}
+                className="text-emerald-200 drop-shadow-[0_0_10px_rgba(45,212,191,0.9)]"
+              />
+              <span className="absolute top-1 right-1 inline-flex h-2 w-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(248,113,113,0.9)]" />
+            </ActionIcon>
+          )}
         </div>
 
         {/* Profile menu */}
-        <ProfileMenu />
+        {token && <ProfileMenu />}
       </div>
     </header>
   );

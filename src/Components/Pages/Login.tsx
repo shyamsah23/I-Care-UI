@@ -1,30 +1,18 @@
 import { useState } from "react";
 import {Paper,TextInput,PasswordInput,Select,Checkbox,Button,Title,Text,Group,Stack} from "@mantine/core";
-import { Link } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import loginUser from "../../Services/UserService";
-
+import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
+import { useDispatch, useSelector } from "react-redux";
+import { addJWTToken, deleteJWTToken } from "../../Slices/JWTSlice";
+import { jwtDecode } from 'jwt-decode';
+import { addUserDetails } from "../../Slices/UserSlice";
 
 export default function Login() {
  
-  const [userData, setUserData] = useState({ username: "", password: "", role: "DOCTOR" });
-  
-  // const HandleUserLogin = async () => {
-  //   console.log("calling login user api from backend");
-  //   const data = await axios.post(
-  //     "http://localhost:8081/auth/user/login",
-  //     {
-  //       username: userData.username,
-  //       password: userData.password,
-  //     },
-  //     {
-  //       headers: {
-  //         'x-secret-key': '987654321HEAD'
-  //       },
-  //     }
-  //   );
-  //   console.log({ data });
-  // };
-  
+  const [userData, setUserData] = useState({ username: "", password: ""});
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const HandleSubmit = async (e) => {
     e.preventDefault();
@@ -34,11 +22,18 @@ export default function Login() {
         username: userData.username,
         password: userData.password,
       });
-
+      const user = jwtDecode(response.jwtToken);
+      successNotification("Logged in Successfully");
+      dispatch(addJWTToken(response.jwtToken));
+      dispatch(addUserDetails(jwtDecode(response?.jwtToken)));
+      // navigate(`/${(user?.role).toLowerCase()}/dashboard`);
+      console.log(jwtDecode(response.jwtToken));
       console.log("Login success:", response);
     } catch (error) {
+      errorNotification(error?.response?.data?.errorMessage);
       console.error("Login error:", error);
     }
+
   };
 
   return (
@@ -54,7 +49,7 @@ export default function Login() {
         alignItems: "center",
         justifyContent: "center",
         padding: "1rem",
-        position: "relative",
+        position: "fixed",
       }}
     >
       {/* Dark overlay */}
@@ -125,33 +120,6 @@ export default function Login() {
               input: {
                 backgroundColor: "rgba(15,23,42,0.9)",
                 color: "white",
-              },
-            }}
-          />
-
-          <Select
-            label="Role"
-            placeholder="Select role"
-            radius="md"
-            data={[
-              { value: "ADMIN", label: "Admin" },
-              { value: "DOCTOR", label: "Doctor" },
-              { value: "NURSE", label: "Nurse" },
-              { value: "RECEPTIONIST", label: "Receptionist" },
-              { value: "PHARMACIST", label: "Pharmacist" },
-            ]}
-            value={userData.role}
-            onChange={(roleChosen) =>
-              setUserData((c)=>({ ...c, role: roleChosen ? roleChosen : "" }))
-            }
-            styles={{
-              input: {
-                backgroundColor: "rgba(15,23,42,0.9)",
-                color: "white",
-              },
-              dropdown: {
-                backgroundColor: "rgba(15,23,42,0.9)",
-                color: "#38d9a9",
               },
             }}
           />

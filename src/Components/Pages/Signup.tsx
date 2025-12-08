@@ -10,19 +10,42 @@ import {
   Stack,
   SimpleGrid,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signupUser } from "../../Services/UserService";
+import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
 
 export default function Signup() {
-  const [userData, setUserData] = useState({ email: "", password: "", role:"PATIENT",username:"", phoneNo:"0",confirmPassword:""});
-  const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false, passwordMismatch:false });
+  const [userData, setUserData] = useState({ email: "", password: "", role:"PATIENT",username:"", name:"",confirmPassword:""});
+  const [errorFlag, setErrorFag] = useState({ emailInvalid: false, passwordInvalid: false, passwordMismatch: false });
+  const navigate = useNavigate();
   const email_regex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   const password_regex = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
+
   
   const HandlePasswordCheck = () => {
     (userData.password != userData.confirmPassword) ?
       setErrorFag((c) => ({ ...c, passwordMismatch: true })) : setErrorFag((c) => ({ ...c, passwordMismatch: false }));
   }
-  const HandleSubmit = (e) => {
+  
+  const HandleSignup = async () => {
+    try {
+      const response = await signupUser({
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role,
+      });
+      successNotification("Registration Successful");
+      navigate("/login");
+      console.log("Signup success:", response);
+    } catch (error) {
+      errorNotification(error?.response?.data?.errorMessage);
+      console.error("Signup error:", error);
+    }
+  };
+
+  const HandleSubmit = async(e) => {
     e.preventDefault();
     const emailCheck = email_regex.test(userData.email);
     const passwordCheck = password_regex.test(userData.password);
@@ -38,7 +61,9 @@ export default function Signup() {
     HandlePasswordCheck();
 
     if (!errorFlag.emailInvalid && !errorFlag.passwordInvalid) console.log(userData);
-    // setUserData({ email: "", password: "", role: "", username: "",phoneNo:"",confirmPassword:"" });
+    
+    await HandleSignup();
+    // setUserData({ email: "", password: "", role: "", username: "", name: "", confirmPassword: "" });
   }
   return (
     <div
@@ -97,9 +122,9 @@ export default function Signup() {
             label="Full name"
             placeholder="Dr. John Doe"
             required
-            value={userData.username}
+            value={userData.name}
             onChange={(e) => {
-              setUserData((c) => ({ ...c, username: e.target.value }));
+              setUserData((c) => ({ ...c, name: e.target.value }));
             }}
             radius="md"
             styles={{
@@ -132,30 +157,30 @@ export default function Signup() {
 
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             <TextInput
-              label="Phone"
-              placeholder="+91 98765 43210"
-              value={userData.phoneNo}
-              onChange={(e) => {
-                setUserData((c) => ({ ...c, username: e.target.value }));
-              }}
-              radius="md"
-              styles={{
-                input: {
-                  backgroundColor: "rgba(15,23,42,0.9)",
-                  color: "white",
-                },
-              }}
+            label="Username"
+            placeholder="JohnDoe@123"
+            required
+            value={userData.username}
+            onChange={(e) => {
+              setUserData((c) => ({ ...c, username: e.target.value }));
+            }}
+            radius="md"
+            styles={{
+              input: {
+                backgroundColor: "rgba(15,23,42,0.9)",
+                color: "white",
+              },
+            }}
             />
-
+            
             <Select
               label="Role"
               placeholder="Select role"
               data={[
                 { value: "DOCTOR", label: "Doctor" },
-                { value: "NURSE", label: "Nurse" },
-                { value: "RECEPTIONIST", label: "Receptionist" },
-                { value: "PHARMACIST", label: "Pharmacist" },
+                { value: "PATIENT", label: "Patient" },
                 { value: "ADMIN", label: "Admin" },
+                // { value: "PHARMACIST", label: "Pharmacist" },
               ]}
               value={userData.role}
               onChange={(roleChosen) =>

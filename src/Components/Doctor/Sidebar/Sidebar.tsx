@@ -20,7 +20,7 @@ const links = [
     name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
   },
 ]
-const Sidebar = () => {
+const DoctorSidebar = () => {
   const userDetails = useSelector((state: any) => state.userSlice);
   return (
     <aside
@@ -132,4 +132,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default DoctorSidebar;
