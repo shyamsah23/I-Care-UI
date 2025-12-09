@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {Paper,TextInput,PasswordInput,Select,Checkbox,Button,Title,Text,Group,Stack} from "@mantine/core";
-import { data, Link, useNavigate } from "react-router-dom";
+import { data, Link, Navigate, useNavigate } from "react-router-dom";
 import loginUser from "../../Services/UserService";
 import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,13 +8,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { addJWTToken, deleteJWTToken } from "../../Slices/AuthSlice";
 import { jwtDecode } from 'jwt-decode';
 import { addUserDetails } from "../../Slices/UserSlice";
+import { getProfileData } from "../../Services/ProfileService";
+import { addProfileDetails } from "../../Slices/ProfileSlice";
 
 export default function Login() {
  
   const [userData, setUserData] = useState({ username: "", password: ""});
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  
   const HandleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,13 +25,19 @@ export default function Login() {
         username: userData.username,
         password: userData.password,
       });
-      const user = jwtDecode(response.jwtToken);
+      const token = response?.jwtToken;
+      const user = jwtDecode(token);
       successNotification("Logged in Successfully");
-      dispatch(addJWTToken(response.jwtToken));
+      dispatch(addJWTToken(response?.jwtToken));
       dispatch(addUserDetails(jwtDecode(response?.jwtToken)));
-      // navigate(`/${(user?.role).toLowerCase()}/dashboard`);
-      console.log(jwtDecode(response.jwtToken));
+      // console.log("User",jwtDecode(response.jwtToken));
       console.log("Login success:", response);
+      // console.log("details being pushed", user?.profileId, user,token);
+      const profile = await getProfileData(user?.profileId, user,token);
+      // console.log("profile_data", profile);
+      if (profile.phone != null) {
+        dispatch(addProfileDetails(profile));
+      } navigate("/");
     } catch (error) {
       errorNotification(error?.response?.data?.errorMessage);
       console.error("Login error:", error);

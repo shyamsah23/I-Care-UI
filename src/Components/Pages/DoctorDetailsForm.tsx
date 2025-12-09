@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Checkbox,
@@ -9,51 +9,52 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import createProfile from "../../Services/ProfileService";
-import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
+import { useDispatch, useSelector } from "react-redux";
+import updateProfile, { getProfileData } from "../../Services/ProfileService";
+import {
+  errorNotification,
+  successNotification,
+} from "../../Utility/NotificationUtility";
+import {
+  COLORS,
+  baseInputStyle,
+  handleBtnEnter,
+  handleBtnLeave,
+  paperStyle,
+  headerTitleStyle,
+  labelStyle,
+  errorStyle,
+  rowStyle,
+  colStyle,
+  selectStyle,
+} from "./PredefinedCSS";
+import { useNavigate } from "react-router-dom";
+import { addProfileDetails } from "../../Slices/ProfileSlice";
+import { departmentOptions } from "../../utils/Constants";
 
-const COLORS = {
-  pageBlack: "#000000",
-  cardBg: "rgba(15,23,42,0.92)", // slate-ish
-  inputBg: "rgba(15,23,42,0.9)",
-  emerald: "#10b981",
-  whiteDim: "rgba(255,255,255,0.9)",
-  error: "#ef4444",
-};
-
-const baseInputStyle: React.CSSProperties = {
-  width: "100%",
-  background: COLORS.inputBg,
-  color: "white",
-  borderRadius: 8,
-  border: "1px solid rgba(255,255,255,0.08)",
-  padding: "10px 12px",
-  fontSize: "0.95rem",
-  outline: "none",
-  boxSizing: "border-box",
-};
-
-export default function PatientProfileForm() {
+export default function DoctorProfileForm() {
   const token = useSelector((state: any) => state.jwtSlice).toString();
   const user = useSelector((state: any) => state.userSlice);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
   const [profileData, setProfileData] = useState({
     id: user?.decoded?.profileId,
-    name: user?.decoded?.name,
+    name: user?.decoded?.sub,
     email: user?.decoded?.emailId,
     dob: "",
     phone: "",
     address: "",
-    aadhaarNo: "",
-    bloodGroup: "",
+    department:"",
+    licenseNo: "",
+    specialization: "",
+    totalExp:""
   });
 
   const [submitting, setSubmitting] = useState(false);
 
-  const [errors, setErrors] = useState<{ phone?: string; aadhaarNo?: string }>(
+  const [errors, setErrors] = useState<{ phone?: string; licenseNo?: string; specialization?: string; dob?: string }>(
     {}
   );
 
@@ -63,68 +64,24 @@ export default function PatientProfileForm() {
     return undefined;
   }
 
-  function validateAadhaar(aadhaar?: string) {
-    if (!aadhaar) return "Aadhaar is required";
-    const digits = aadhaar.replace(/\s+/g, "");
-    if (!/^\d{12}$/.test(digits)) return "Aadhaar must be 12 digits";
+  function validateLicenseNo(licenseNo?: string) {
+  if (!licenseNo) return "License number is required";
+  const regex = /^[A-Za-z]{2,5}[\/\-]?[A-Za-z0-9]{3,10}$/;
+  if (!regex.test(licenseNo)) return "License number isn't valid";
+  return undefined;  
+  } 
+
+
+  function validateSpecialization(specialization?: string) {
+    if (!specialization) return "Specialization is required";
+    const regex = /^[A-Za-z ]{3,50}$/;
+    if (!regex.test(specialization)) return "Specialization isn't valid";
     return undefined;
   }
 
-  const bloodGroupOptions = [
-    { value: "A_POSITIVE", label: "A+" },
-    { value: "A_NEGATIVE", label: "A-" },
-    { value: "B_POSITIVE", label: "B+" },
-    { value: "B_NEGATIVE", label: "B-" },
-    { value: "AB_POSITIVE", label: "AB+" },
-    { value: "AB_NEGATIVE", label: "AB-" },
-    { value: "O_POSITIVE", label: "O+" },
-    { value: "O_NEGATIVE", label: "O-" },
-  ];
-
-  const HandleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const phoneErr = validatePhone(profileData.phone);
-    const aadhaarErr = validateAadhaar(profileData.aadhaarNo);
-
-    if (!phoneErr || !aadhaarErr)
-      errorNotification("Please enter correct details");
-    setErrors({ phone: phoneErr, aadhaarNo: aadhaarErr });
-
-    try {
-      const response = await createProfile({
-        id: profileData.id,
-        name: profileData.name,
-        email: profileData.email,
-        dob: profileData.dob ?? null,
-        phone: profileData.phone,
-        address: profileData.address,
-        aadhaarNo: profileData.aadhaarNo,
-        bloodGroup: profileData.bloodGroup,
-      }, token);
-      setSubmitting(true);
-      console.log("Profile created:", response);
-      successNotification("Profile Created Successfully");
-    } catch (error: any) {
-      console.error("Profile creation error:", error);
-      errorNotification(
-        error?.response?.data?.errorMessage || "Failed to save profile"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDobChange = (date: Date) => {
-    setProfileData((p) => ({
-      ...p,
-      dob: date ? date.toISOString().split("T")[0] : "",
-    }));
-  };
 
   function validateDob(dob?: string) {
     if (!dob) return "DOB is required";
-    // format YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return "Use format YYYY-MM-DD";
     const parts = dob.split("-");
     const year = Number(parts[0]);
@@ -143,56 +100,48 @@ export default function PatientProfileForm() {
     if (dtOnly > todayOnly) return "DOB cannot be in the future";
     return "";
   }
-  const handleBtnEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
-    (
-      e.currentTarget as HTMLButtonElement
-    ).style.boxShadow = `0 10px 25px ${COLORS.emerald}55`;
-  };
-  const handleBtnLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
-    (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
-  };
 
-  const paperStyle: React.CSSProperties = {
-    position: "relative",
-    zIndex: 1,
-    maxWidth: 480,
-    width: "100%",
-    backgroundColor: COLORS.cardBg,
-    border: `1px solid ${COLORS.emerald}99`,
-    padding: 20,
-    borderRadius: 10,
-  };
+  const HandleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const headerTitleStyle: React.CSSProperties = {
-    margin: 0,
-    color: COLORS.emerald,
-    fontSize: 20,
-    lineHeight: 1,
-  };
+    const phoneErr = validatePhone(profileData.phone);
+    const licenseNoErr = validateLicenseNo(profileData.licenseNo);
+    const specializationErr = validateSpecialization(profileData.specialization);
+    const DobErr = validateDob(profileData.dob);
 
-  const labelStyle: React.CSSProperties = {
-    display: "block",
-    color: COLORS.whiteDim,
-    marginBottom: 6,
-    fontSize: 14,
-  };
+    if (phoneErr || licenseNoErr||specializationErr||DobErr)
+      errorNotification("Please enter correct details");
+    setErrors({ phone: phoneErr, licenseNo:licenseNoErr, specialization:specializationErr,dob:DobErr});
 
-  const errorStyle: React.CSSProperties = {
-    color: COLORS.error,
-    marginTop: 6,
-    fontSize: 13,
-  };
+    const payload = {
+      id: profileData.id,
+      name: profileData.name,
+      email: profileData.email,
+      dob: profileData.dob,
+      phone: profileData.phone,
+      address: profileData.address,
+      department: profileData.department,
+      licenseNo: profileData.licenseNo,
+      specialization: profileData.specialization,
+      totalExp: profileData.totalExp,
+    };
 
-  const rowStyle: React.CSSProperties = { display: "flex", gap: 12 };
-  const colStyle: React.CSSProperties = { flex: 1, minWidth: 0 };
-
-  const selectStyle: React.CSSProperties = {
-    width: "100%",
-    padding: "10px 12px",
-    borderRadius: 8,
-    background: COLORS.inputBg,
-    color: "white",
-    border: "1px solid rgba(255,255,255,0.08)",
+    try {
+      console.log("payload", payload);
+      await updateProfile(payload, token, user);
+      setSubmitting(true);
+      dispatch(addProfileDetails(payload));
+      console.log("Profile created:");
+      successNotification("Profile Created Successfully");
+      navigate("/");
+    } catch (error: any) {
+      console.error("Profile creation error:", error);
+      errorNotification(
+        error?.response?.data?.errorMessage || "Failed to save profile"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -211,7 +160,6 @@ export default function PatientProfileForm() {
         position: "relative",
       }}
     >
-      {/* Dark overlay */}
       <div
         style={{
           position: "absolute",
@@ -232,12 +180,11 @@ export default function PatientProfileForm() {
         <Stack spacing="sm" style={{ marginBottom: 12, alignItems: "center" }}>
           <Title style={headerTitleStyle}>I-Care Hospital</Title>
           <Text style={{ color: "rgba(255,255,255,0.85)" }}>
-            Update your profile
+            Create your profile
           </Text>
         </Stack>
 
         <Stack spacing="sm">
-          {/* DOB + Phone */}
           <div style={rowStyle}>
             <div style={colStyle}>
               <label style={labelStyle}>Date of Birth (YYYY-MM-DD)</label>
@@ -284,42 +231,41 @@ export default function PatientProfileForm() {
             </div>
           </div>
 
-          {/* Aadhaar + Blood */}
           <div style={rowStyle}>
             <div style={colStyle}>
-              <label style={labelStyle}>Aadhaar number</label>
+              <label style={labelStyle}>License Number</label>
               <input
                 type="text"
-                placeholder="1234 5678 9012"
-                value={profileData.aadhaarNo ?? ""}
+                placeholder="MH12345"
+                value={profileData.licenseNo ?? ""}
                 onChange={(e) =>
-                  setProfileData((p) => ({ ...p, aadhaarNo: e.target.value }))
+                  setProfileData((p) => ({ ...p, licenseNo: e.target.value }))
                 }
                 required
                 style={baseInputStyle}
                 onBlur={() =>
                   setErrors((s) => ({
                     ...s,
-                    aadhaarNo: validateAadhaar(profileData.aadhaarNo),
+                    aadhaarNo: validateLicenseNo(profileData.licenseNo),
                   }))
                 }
               />
-              {errors.aadhaarNo ? (
-                <div style={errorStyle}>{errors.aadhaarNo}</div>
+              {errors.licenseNo ? (
+                <div style={errorStyle}>{errors.licenseNo}</div>
               ) : null}
             </div>
 
             <div style={colStyle}>
-              <label style={labelStyle}>Blood group</label>
+              <label style={labelStyle}>Department</label>
               <select
-                value={profileData.bloodGroup ?? ""}
+                value={profileData.department ?? ""}
                 onChange={(e) =>
-                  setProfileData((p) => ({ ...p, bloodGroup: e.target.value }))
+                  setProfileData((p) => ({ ...p, department: e.target.value }))
                 }
                 style={selectStyle}
               >
                 <option value="">Select</option>
-                {bloodGroupOptions.map((b) => (
+                {departmentOptions.map((b) => (
                   <option key={b.value} value={b.value}>
                     {b.label}
                   </option>
@@ -328,7 +274,50 @@ export default function PatientProfileForm() {
             </div>
           </div>
 
-          {/* Address */}
+          <div style={rowStyle}>
+            <div style={colStyle}>
+              <label style={labelStyle}>Specialization</label>
+              <input
+                type="text"
+                placeholder="Heart Surgeon"
+                value={profileData.specialization ?? ""}
+                onChange={(e) =>
+                  setProfileData((p) => ({
+                    ...p,
+                    specialization: e.target.value,
+                  }))
+                }
+                required
+                style={baseInputStyle}
+                onBlur={() =>
+                  setErrors((s) => ({
+                    ...s,
+                    specialization: validateSpecialization(
+                      profileData.specialization
+                    ),
+                  }))
+                }
+              />
+              {errors.specialization ? (
+                <div style={errorStyle}>{errors.specialization}</div>
+              ) : null}
+            </div>
+
+            <div style={colStyle}>
+              <label style={labelStyle}>Total Experience</label>
+              <input
+                type="tel"
+                placeholder="0-60"
+                value={profileData.totalExp ?? ""}
+                onChange={(e) =>
+                  setProfileData((p) => ({ ...p, totalExp: e.target.value }))
+                }
+                required
+                style={baseInputStyle}
+              />
+            </div>
+          </div>
+
           <div>
             <label style={labelStyle}>Address</label>
             <textarea
@@ -345,7 +334,6 @@ export default function PatientProfileForm() {
             />
           </div>
 
-          {/* Save + note */}
           <Group position="apart" style={{ marginTop: 6 }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Checkbox checked={false} onChange={() => {}} />
@@ -353,14 +341,12 @@ export default function PatientProfileForm() {
                 Save on this device
               </div>
             </div>
-
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.75)" }}>
-              Name / email / id from user service
-            </div>
           </Group>
 
-          {/* Submit */}
-          <Group position="right" style={{ marginTop: 8 }}>
+          <Stack
+            spacing="sm"
+            style={{ marginBottom: 12, alignItems: "center" }}
+          >
             <Button
               type="submit"
               radius="md"
@@ -373,11 +359,12 @@ export default function PatientProfileForm() {
                 fontWeight: 700,
                 padding: "10px 16px",
                 border: "none",
+                maxWidth: "150px",
               }}
             >
               {submitting ? <Loader size="xs" color="white" /> : "Save profile"}
             </Button>
-          </Group>
+          </Stack>
 
           <Text
             style={{
@@ -386,16 +373,16 @@ export default function PatientProfileForm() {
               marginTop: 8,
             }}
           >
-            Need to update your account?{" "}
+            Create Profile later?{" "}
             <Link
-              to="/support"
+              to="/"
               style={{
                 color: COLORS.emerald,
                 fontWeight: 600,
                 textDecoration: "none",
               }}
             >
-              Contact support
+              Home Page
             </Link>
           </Text>
         </Stack>

@@ -38,7 +38,7 @@ export default function PatientProfileForm() {
  
   const [profileData, setProfileData] = useState({
     id: user?.decoded?.profileId,
-    name: user?.decoded?.name,
+    name: user?.decoded?.sub,
     email: user?.decoded?.emailId,
     dob: "",
     phone: "",
@@ -64,30 +64,6 @@ export default function PatientProfileForm() {
     return undefined;
   }
 
- useEffect(() => {
-   const checkProfilePresent = async () => {
-     try {
-       const profile = await getProfileData(
-         user?.decoded?.profileId,
-         user,
-         token
-       );
-       
-       if (profile.dob != null) {
-         dispatch(addProfileDetails(profile));
-         navigate("/");
-       }
-
-       console.log("Profile data fetched", profile);
-       
-     } catch (error) {
-       console.error("Error fetching profile", error);
-     }
-   };
-
-   checkProfilePresent(); 
- }, []); 
-
   const HandleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -110,15 +86,15 @@ export default function PatientProfileForm() {
     };
 
     try {
-      const response = await updateProfile({
-        payload
-      }, token,user);
+      console.log("payload", payload);
+      await updateProfile(payload, token,user);
       setSubmitting(true);
       dispatch(addProfileDetails(payload));
-      console.log("Profile created:", response);
+      // console.log("Profile created:", response);
       successNotification("Profile Created Successfully");
+      navigate("/");
     } catch (error: any) {
-      console.error("Profile creation error:", error);
+      // console.error("Profile creation error:", error);
       errorNotification(
         error?.response?.data?.errorMessage || "Failed to save profile"
       );

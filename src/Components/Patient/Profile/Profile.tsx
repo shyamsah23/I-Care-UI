@@ -22,8 +22,10 @@ import {
   IconDroplet,
   IconEdit,
   IconX,
+  IconHttpDelete,
+  IconTrash,
 } from "@tabler/icons-react";
-import updateProfile from "../../../Services/ProfileService";
+import updateProfile, { getProfileData } from "../../../Services/ProfileService";
 import { addProfileDetails } from "../../../Slices/ProfileSlice";
 import { errorNotification, successNotification } from "../../../Utility/NotificationUtility";
 
@@ -32,27 +34,41 @@ const PatientProfile = () => {
   const user = useSelector((state: any) => state.userSlice);
   const profile = useSelector((state: any) => state.profileSlice);
   const dispatch = useDispatch();
-  const { role, sub } = user?.decoded;
+  const { profileId,role, sub } = user?.decoded;
   const { id,dob, aadhaarNo, phone, address, bloodGroup, email } = profile?.items;
   console.log(profile?.items);
 
   const [loading, setLoading] = useState(true);
   const [opened, setOpened] = useState(false);
-  // const [editable, setEditable] = useState<any>({ dob:dob, aadhaarNo:aadhaarNo, phone:phone, address:address, bloodGroup:bloodGroup, name: sub });
   const [profileData, setProfileData] = useState({ dob:dob, aadhaarNo:aadhaarNo, phone:phone, address:address, bloodGroup:bloodGroup, name: sub });
 
-
-  useEffect(() => {
-    setLoading(true);
-    const t = setTimeout(() => {
-      console.log("after",profileData)
-      setProfileData({ dob, aadhaarNo, phone, address, bloodGroup, name: sub });
+useEffect(() => {
+  setLoading(true);
+  const init = async () => {
+    //timeout set karna padega and handle jwt expiration
+    try {
+      const profile = await getProfileData(profileId, user, token);
+      dispatch(addProfileDetails(profile));
+      setProfileData({ dob: dob, aadhaarNo: aadhaarNo, phone: phone, address: address, bloodGroup: bloodGroup, name: sub })
       setLoading(false);
-    }, 300); 
-   
-    return () => clearTimeout(t);
-  }, []);
-  // useEffect(() => {}, [profileData]);
+    } catch (err) {
+      console.error("Failed to load profile data", err);
+    }
+  };
+  init();
+}, []);
+  
+  // useEffect(() => {
+  //   const 
+  //   setLoading(true);
+  //   const t = setTimeout(() => {
+  //     // dispatch(addProfileDetails())
+  //     setProfileData({ dob:dob, aadhaarNo:aadhaarNo, phone:phone, address:address, bloodGroup:bloodGroup, name: sub })
+  //     setLoading(false);
+  //   }, 300);
+
+  //   return () => clearTimeout(t);
+  // }, []);
 
   const payload = {
     id: id,
@@ -65,20 +81,22 @@ const PatientProfile = () => {
     bloodGroup: profileData.bloodGroup,
   };
   
-    const handleUpdate = async () => {
-      try {
-        await updateProfile(payload, token, user);
-        // dispatch(addProfileDetails());
-        console.log("Profile updated:");
-        successNotification("Profile Created Successfully");
-        setOpened(false);
-      } catch (error: any) {
-        console.error("Profile creation error:", error);
-        errorNotification(
-          error?.response?.data?.errorMessage || "Failed to save profile"
-        );
-      }
-  }
+  const handleUpdate = async () => {
+    try {
+      await updateProfile(payload, token, user);
+      const response = await getProfileData(id, user, token);
+      dispatch(addProfileDetails(response));
+      setProfileData;
+      console.log("Profile updated:");
+      successNotification("Profile Created Successfully");
+      setOpened(false);
+    } catch (error: any) {
+      console.error("Profile creation error:", error);
+      errorNotification(
+        error?.response?.data?.errorMessage || "Failed to save profile"
+      );
+    }
+  };
  
   return (
     <div className="min-h-screen p-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-pink-50 flex items-start justify-center">
@@ -184,11 +202,11 @@ const PatientProfile = () => {
                 </div>
 
                 <Group spacing={8}>
-                  <ActionIcon variant="light" radius="md">
+                  <ActionIcon variant="light" radius="md" onClick={() => setOpened(true)}>
                     <IconEdit size={18} />
                   </ActionIcon>
-                  <ActionIcon radius="md" variant="light">
-                    {/* <IconFloppyDisk size={18} /> */}
+                  <ActionIcon radius="md" variant="light" color="red">
+                    <IconTrash size={18} />
                   </ActionIcon>
                 </Group>
               </div>
@@ -231,7 +249,6 @@ const PatientProfile = () => {
               </div>
             </Card>
 
-            {/* Small actions / history */}
             <Card shadow="sm" radius="lg" padding="lg" className="bg-white/95">
               <div className="flex items-center justify-between">
                 <Text fw={700}>Activity</Text>
@@ -258,7 +275,6 @@ const PatientProfile = () => {
         </div>
       </motion.div>
 
-      {/* Edit Modal */}
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
@@ -294,10 +310,7 @@ const PatientProfile = () => {
             label="Aadhaar"
             value={profileData?.aadhaarNo || ""}
             onChange={(e) =>
-              setProfileData((p: any) => ({
-                ...p,
-                aadhaarNo: e.target.value,
-              }))
+              setProfileData((p: any) => ({ ...p, aadhaarNo: e.target.value }))
             }
           />
 
@@ -305,10 +318,7 @@ const PatientProfile = () => {
             label="Blood group"
             value={profileData?.bloodGroup || ""}
             onChange={(e) =>
-              setProfileData((p: any) => ({
-                ...p,
-                bloodGroup: e.target.value,
-              }))
+              setProfileData((p: any) => ({ ...p, bloodGroup: e.target.value }))
             }
           />
 
@@ -332,8 +342,6 @@ const PatientProfile = () => {
     </div>
   );
 };
-
-/* ---------- Small helper components ---------- */
 
 const FieldRow = ({ label, value, icon, loading, colorClass }: any) => (
   <div className="flex items-start gap-3">

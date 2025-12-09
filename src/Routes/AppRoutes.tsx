@@ -12,6 +12,7 @@ import DoctorDashboard from '../Components/Layout/DoctorDashboard';
 import DoctorProfile from '../Components/Doctor/Profile/Profile';
 import PatientProfile from '../Components/Patient/Profile/Profile';
 import PatientProfileForm from '../Components/Pages/PatientDetailsForm';
+import DoctorProfileForm from '../Components/Pages/DoctorDetailsForm';
 
 export const appRouter = createBrowserRouter([
   {
@@ -75,7 +76,7 @@ export const appRouter = createBrowserRouter([
   },
   {
     path: `/profile/doctor`,
-    element: <ProtectedRoute><PatientProfileForm/></ProtectedRoute>,
+    element: <ProtectedRoute><DoctorProfileForm/></ProtectedRoute>,
   }
 ]);
 
