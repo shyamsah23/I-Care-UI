@@ -1,26 +1,23 @@
 import { ActionIcon, Avatar, Text } from '@mantine/core';
-import { IconCalendarCheck, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconStethoscope } from '@tabler/icons-react';
+import { IconCalendarCheck, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconStethoscope, IconUser } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const links = [
   {
-    name:"Dashboard",url:"/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
+    name:"Dashboard",url:"doctor/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
   },
   {
-    name:"Doctors",url:"/doctors" ,icon:<IconStethoscope stroke={1.5}/>
+    name:"Profile",url:"doctor/profile" ,icon:<IconUser stroke={1.5}/>
   },
   {
-    name:"Patient",url:"/patients",icon:<IconEmergencyBed stroke={1.5}/>
-  },
-  {
-    name:"Appointments",url:"/appointments",icon:<IconCalendarCheck stroke={1.5}/>
+    name:"Appointments",url:"doctor/appointments",icon:<IconCalendarCheck stroke={1.5}/>
   },
   {
     name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
   },
 ]
-const Sidebar = () => {
+const DoctorSidebar = () => {
   const userDetails = useSelector((state: any) => state.userSlice);
   return (
     <aside
@@ -132,4 +129,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default DoctorSidebar;

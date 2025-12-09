@@ -1,4 +1,3 @@
-import React from 'react'
 import { Menu, Button, Text, Avatar } from "@mantine/core";
 import {
   IconSettings,
@@ -7,10 +6,28 @@ import {
   IconMessageCircle,
   IconTrash,
   IconArrowsLeftRight,
+  IconLogout,
 } from "@tabler/icons-react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { removeUserDetails } from "../../Slices/UserSlice";
+// import { deleteJWTToken } from "../../Slices/JWTSlice";
+import { deleteJWTToken } from "../../Slices/AuthSlice";
 
 
-const ProfileMenu=()=> {
+
+
+const ProfileMenu = () => {
+  const userDetails = useSelector((state: any) => state.userSlice);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    console.log(userDetails?.decoded?.sub)
+  }, [userDetails,])
+  
+  const HandleLogout = () => {
+    dispatch(removeUserDetails());
+    dispatch(deleteJWTToken());
+  }
  return (
    <Menu
      shadow="md"
@@ -27,13 +44,13 @@ const ProfileMenu=()=> {
    >
      <Menu.Target>
        <div className="flex items-center gap-3 cursor-pointer">
-         <span className="font-medium text-lg text-emerald-50">Ayush</span>
+         <span className="font-medium text-lg text-emerald-50">{userDetails?.decoded?.sub}</span>
          <div className="p-1 bg-emerald-500/20 rounded-full border border-emerald-400/60 shadow-md">
            <Avatar
              variant="filled"
              src="../myAvatar.png"
              size={35}
-             alt="it's me"
+             alt="Image"
              radius="xl"
            />
          </div>
@@ -60,9 +77,8 @@ const ProfileMenu=()=> {
 
        <Menu.Divider />
 
-       <Menu.Label>Danger zone</Menu.Label>
-       <Menu.Item leftSection={<IconArrowsLeftRight size={14} />}>
-         Transfer my data
+       <Menu.Item leftSection={<IconLogout size={14} />} onClick={HandleLogout}>
+         Logout
        </Menu.Item>
        <Menu.Item
          color="red"

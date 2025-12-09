@@ -1,27 +1,25 @@
 import { ActionIcon, Avatar, Text } from '@mantine/core';
-import { IconCalendarCheck, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconStethoscope } from '@tabler/icons-react';
+import { IconBook, IconCalendarCheck, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup,IconUser } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const links = [
   {
-    name:"Dashboard",url:"/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
+    name:"Dashboard",url:"/patient/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
   },
   {
-    name:"Doctors",url:"/doctors" ,icon:<IconStethoscope stroke={1.5}/>
+    name:"Profile",url:"/patient/profile" ,icon:<IconUser stroke={1.5}/>
   },
   {
-    name:"Patient",url:"/patients",icon:<IconEmergencyBed stroke={1.5}/>
-  },
-  {
-    name:"Appointments",url:"/appointments",icon:<IconCalendarCheck stroke={1.5}/>
+    name:"Appointments",url:"/patient/appointments",icon:<IconCalendarCheck stroke={1.5}/>
   },
   {
     name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
   },
 ]
-const Sidebar = () => {
+const PatientSidebar = () => {
   const userDetails = useSelector((state: any) => state.userSlice);
+  console.log(userDetails);
   return (
     <aside
       className="
@@ -81,7 +79,7 @@ const Sidebar = () => {
           />
         </div>
         <span className="font-semibold text-xl text-white">{userDetails?.decoded?.sub}</span>
-        <Text c="dimmed" size="xs" className='text-light'>{userDetails?.role}</Text>
+        <Text c="dimmed" size="xs" className='text-light'>{userDetails?.decoded?.role}</Text>
       </div>
 
       {/* Navigation */}
@@ -132,4 +130,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default PatientSidebar;

@@ -1,72 +1,82 @@
-import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
-import Dashboard from '../Components/Layout/Dashboard';
-import Error from '../Components/Error';
-import Appointments from '../Components/Appointments';
-import Pharmacy from '../Components/Pharmacy';
+import { createBrowserRouter, Outlet} from 'react-router-dom';
+import Error from '../Components/Pages/Error';
+import Appointments from '../Components/Pages/Appointments';
+import Pharmacy from '../Components/Pages/Pharmacy';
 import Signup from '../Components/Pages/Signup';
 import Login from '../Components/Pages/Login';
+import PublicRoute from './PublicRoute';
+import ProtectedRoute from './ProtectedRoute';
 import App from '../App';
-import Doctor from '../Components/Doctor';
-import Patient from '../Components/Patient';
-
-
-const AppRoutes = () => {
-
-  return (
-    <div>
-      <div className="">
-        <App />
-        <main
-          className="
-          pt-16
-          md:ml-64
-          p-4 md:p-6
-        "
-        >
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
-
-}
+import PatientDashboard from '../Components/Layout/PatientDashboard';
+import DoctorDashboard from '../Components/Layout/DoctorDashboard';
+import DoctorProfile from '../Components/Doctor/Profile/Profile';
+import PatientProfile from '../Components/Patient/Profile/Profile';
+import PatientProfileForm from '../Components/Pages/PatientDetailsForm';
+import DoctorProfileForm from '../Components/Pages/DoctorDetailsForm';
 
 export const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <AppRoutes />,
+    element: <ProtectedRoute><App /></ProtectedRoute>,
     children: [
       {
-        path: "dashboard",
-        element: <Dashboard />,
+        path: "patient/",
+        element: <Outlet/>,
+        children: [
+          {
+            path: "dashboard",
+            element:<PatientDashboard/>
+          },
+          {
+            path: "profile",
+            element:<PatientProfile/>
+          },
+          {
+            path: "appointments",
+            element:<Appointments/>
+          }
+        ]
       },
       {
-        path: "appointments",
-        element: <Appointments />,
+        path: "doctor/",
+        element: <Outlet/>,
+        children: [
+          {
+            path: "dashboard",
+            element:<DoctorDashboard/>
+          },
+          {
+            path: "profile",
+            element:<DoctorProfile/>
+          },
+          {
+            path: "appointments",
+            element:<Appointments/>
+          }
+        ]
       },
       {
         path: "pharmacy",
         element: <Pharmacy />,
-      },
-      {
-        path: "doctors",
-        element: <Doctor />,
-      },
-      {
-        path: "patients",
-        element: <Patient/>,
-      },
+      }
     ],
     errorElement: <Error />,
   },
   {
     path: "/signup",
-    element: <Signup />,
+    element: <PublicRoute> <Signup /></PublicRoute>,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: <PublicRoute> <Login/></PublicRoute>,
   },
+  {
+    path: `/profile/patient`,
+    element: <ProtectedRoute><PatientProfileForm/></ProtectedRoute>,
+  },
+  {
+    path: `/profile/doctor`,
+    element: <ProtectedRoute><DoctorProfileForm/></ProtectedRoute>,
+  }
 ]);
 
-export default AppRoutes;
