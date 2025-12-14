@@ -3,6 +3,7 @@ import { Button, Container, Title, Stack, Loader, Center } from "@mantine/core";
 import { useSelector } from "react-redux";
 import getTodayAppointmentByDoctorId from "../../Services/AppointmentService";
 import { jwtDecode } from "jwt-decode";
+import AppointmentList from "../Doctor/AppointmentDetails/AppointmentList";
 
 
 const Appointments = () => {
@@ -18,8 +19,10 @@ const Appointments = () => {
     try {
       const response = await getTodayAppointmentByDoctorId(5,token)
       console.log("The List of Doctor is = ", response)
+      setAppointment(response)
+      setLoading(false)
     } catch (error) {
-      
+      console.log("Error Fetching Appointment List",error)
     }
   }
 
@@ -34,16 +37,17 @@ const Appointments = () => {
         </Button>
 
 
-        {/* {loading && (
+        {loading && (
           <Center>
             <Loader />
           </Center>
-        )} */}
+        )}
 
+        
 
-        {/* {!loading && appointments.length > 0 && (
-          <AppointmentList appointments={appointments} />
-        )} */}
+        {!loading && appointment.length > 0 && (
+          <AppointmentList appointment={appointment}/>
+        )}
       </Stack>
     </Container>
   );
