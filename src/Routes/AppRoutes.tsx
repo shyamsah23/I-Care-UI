@@ -13,6 +13,7 @@ import DoctorProfile from '../Components/Doctor/Profile/Profile';
 import PatientProfile from '../Components/Patient/Profile/Profile';
 import PatientProfileForm from '../Components/Pages/PatientDetailsForm';
 import DoctorProfileForm from '../Components/Pages/DoctorDetailsForm';
+import PatientAppointment from '../Components/Pages/Patient/PatientAppointment';
 
 export const appRouter = createBrowserRouter([
   {
@@ -33,7 +34,7 @@ export const appRouter = createBrowserRouter([
           },
           {
             path: "appointments",
-            element:<Appointments/>
+            element: <PatientAppointment/>
           }
         ]
       },
