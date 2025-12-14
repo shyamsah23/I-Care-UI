@@ -2,13 +2,14 @@ import { useTextSelection } from '@mantine/hooks'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { getAllDoctorsList } from '../../../Services/ProfileService'
-import { Container, Table, Button, Select, Group, Text, Loader, Box, Center } from "@mantine/core";
+import { Container, Table, Button, Select, Group, Text, Loader, Box, Center,TextInput } from "@mantine/core";
 
 const PatientAppointment = () => {
 
     const [loading, setLoading] = useState(false)
     const [doctor, setDoctor] = useState([])
     const [departement, setDepartment] = useState("All")
+    const [searchName, setSearchName] = useState("")
 
     const token = useSelector((state) => state.jwtSlice);
 
@@ -37,7 +38,7 @@ const PatientAppointment = () => {
 
     }, [token])
 
-    const filteredDoctors = departement == "All" ? doctor : doctor.filter((doc) => doc.departement == departement)
+    const filteredDoctors = departement == "All" ? doctor : doctor.filter((doc) => doc.department == departement)
     const handleBookAppointment = () => {
         console.log("Schedule Appointment")
     }
@@ -56,6 +57,12 @@ const PatientAppointment = () => {
                     value={departement}
                     onChange={(value) => setDepartment(value || "All")}
                     placeholder="Select department"
+                />
+                <TextInput
+                    label="Search by Doctor Name"
+                    placeholder="Enter doctor name"
+                    value={searchName} // Added
+                    onChange={(event) => setSearchName(event.currentTarget.value)} // Added
                 />
             </Group>
 
