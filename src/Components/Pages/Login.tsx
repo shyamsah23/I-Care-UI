@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Paper,TextInput,PasswordInput,Select,Checkbox,Button,Title,Text,Group,Stack} from "@mantine/core";
+import { Paper, TextInput, PasswordInput, Select, Checkbox, Button, Title, Text, Group, Stack } from "@mantine/core";
 import { data, Link, Navigate, useNavigate } from "react-router-dom";
 import loginUser from "../../Services/UserService";
 import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
@@ -12,11 +12,11 @@ import { getProfileData } from "../../Services/ProfileService";
 import { addProfileDetails } from "../../Slices/ProfileSlice";
 
 export default function Login() {
- 
-  const [userData, setUserData] = useState({ username: "", password: ""});
+
+  const [userData, setUserData] = useState({ username: "", password: "" });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const HandleSubmit = async (e) => {
     e.preventDefault();
 
@@ -27,13 +27,14 @@ export default function Login() {
       });
       const token = response?.jwtToken;
       const user = jwtDecode(token);
+      console.log("The user detail fetched from token is" + user)
       successNotification("Logged in Successfully");
       dispatch(addJWTToken(response?.jwtToken));
       dispatch(addUserDetails(jwtDecode(response?.jwtToken)));
       // console.log("User",jwtDecode(response.jwtToken));
       console.log("Login success:", response);
       // console.log("details being pushed", user?.profileId, user,token);
-      const profile = await getProfileData(user?.profileId, user,token);
+      const profile = await getProfileData(user?.profileId, user, token);
       // console.log("profile_data", profile);
       if (profile.phone != null) {
         dispatch(addProfileDetails(profile));
@@ -70,7 +71,7 @@ export default function Login() {
           backdropFilter: "blur(4px)",
         }}
       />
-     
+
       <Paper
         component="form"
         onSubmit={HandleSubmit}
@@ -105,7 +106,7 @@ export default function Login() {
             required
             value={userData.username}
             onChange={(e) =>
-              setUserData((c)=>({ ...c, username: e.target.value }))
+              setUserData((c) => ({ ...c, username: e.target.value }))
             }
             radius="md"
             styles={{
@@ -122,7 +123,7 @@ export default function Login() {
             required
             value={userData.password}
             onChange={(e) =>
-              setUserData((c)=>({ ...c, password: e.target.value }))
+              setUserData((c) => ({ ...c, password: e.target.value }))
             }
             radius="md"
             styles={{

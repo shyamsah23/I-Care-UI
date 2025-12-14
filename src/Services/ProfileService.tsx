@@ -17,6 +17,7 @@ const updateProfile = async (profile: any, token: string, user:any) => {
 
 export const getProfileData = async (id: any, user: any,token:any) => {
   const role = user?.decoded?.role?.toLowerCase?.() || user?.role?.toLowerCase?.();
+  console.log("The role is " + role);
   return axiosInstance
     .get(`/profile/${role}/get/${id}`, {
       headers: {
