@@ -24,7 +24,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import updateProfile, { getProfileData } from "../../../Services/ProfileService";
-import { addProfileDetails } from "../../../Slices/ProfileSlice";
+import { addProfileDetails, removeProfileDetails } from "../../../Slices/ProfileSlice";
 import { errorNotification, successNotification } from "../../../Utility/NotificationUtility";
 
 const DoctorProfile = () => {
@@ -47,6 +47,7 @@ useEffect(() => {
     //timeout set karna padega and handle jwt expiration
     try {
       const profile = await getProfileData(profileId, user, token);
+      console.log("Profile data fetched to check redirection", profile);
       dispatch(addProfileDetails(profile));
       setProfileData({ dob:dob, specialization:specialization,totalExp:totalExp,department:department, phone:phone, address:address, name: sub, licenseNo:licenseNo})
       setLoading(false);
@@ -98,6 +99,11 @@ useEffect(() => {
       );
     }
   };
+
+  const HandleDeleteProfile = () => {
+    console.log("Deleting profile data");
+    dispatch(removeProfileDetails());
+  }
  
   return (
     <div className="min-h-screen p-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-pink-50 flex items-start justify-center">
@@ -217,7 +223,7 @@ useEffect(() => {
                   </Text>
                 </div>
 
-                <Group >
+                <Group>
                   <ActionIcon
                     variant="light"
                     radius="md"
@@ -225,7 +231,12 @@ useEffect(() => {
                   >
                     <IconEdit size={18} />
                   </ActionIcon>
-                  <ActionIcon radius="md" variant="light" color="red">
+                  <ActionIcon
+                    radius="md"
+                    variant="light"
+                    color="red"
+                    onClick={() => { HandleDeleteProfile() }}
+                  >
                     <IconTrash size={18} />
                   </ActionIcon>
                 </Group>

@@ -6,9 +6,11 @@ const profileSlice = createSlice({
   reducers: {
     addProfileDetails: (state, action) => {
       state.items = action.payload;
+      return state;
     },
     removeProfileDetails: (state) => {
-      state.items = "";
+      state.items="";
+      return state;
     }
   }
 });
