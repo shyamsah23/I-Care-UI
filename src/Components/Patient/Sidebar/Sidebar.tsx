@@ -1,7 +1,7 @@
 import { ActionIcon, Avatar, Text } from '@mantine/core';
 import { IconBook, IconCalendarCheck, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup,IconUser } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const links = [
   {
@@ -13,13 +13,13 @@ const links = [
   {
     name:"Appointments",url:"/patient/appointments",icon:<IconCalendarCheck stroke={1.5}/>
   },
-  {
-    name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
-  },
+  // {
+  //   name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
+  // },
 ]
 const PatientSidebar = () => {
+  const navigate=useNavigate();
   const userDetails = useSelector((state: any) => state.userSlice);
-  console.log(userDetails);
   return (
     <aside
       className="
@@ -61,7 +61,7 @@ const PatientSidebar = () => {
           />
         </ActionIcon>
 
-        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100">
+        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100" onClick={() => navigate("patient/home")}>
           I-Care
         </span>
       </div>

@@ -5,15 +5,16 @@ import { useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import PatientSidebar from './Components/Patient/Sidebar/Sidebar';
 import DoctorSidebar from './Components/Doctor/Sidebar/Sidebar';
+import AdminSidebar from './Components/Admin/Sidebar/Sidebar';
 
 const App = () => {
   const token = useSelector((state: any) => state.jwtSlice);
   const user = jwtDecode(token)?.role;
-  console.log(user);
+  // console.log(user);
   return (
     <div>
       <div className="flex">
-        {user == 'PATIENT' ? <PatientSidebar /> : <DoctorSidebar />}
+          {user == 'ADMIN' ? <AdminSidebar /> : user == 'PATIENT'?<PatientSidebar />:<DoctorSidebar/>}   
         <Header />
       </div>
       <main className="pt-16 md:ml-64 p-4 md:p-6">

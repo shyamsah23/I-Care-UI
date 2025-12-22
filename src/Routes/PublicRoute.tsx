@@ -1,8 +1,5 @@
-import { jwtDecode } from "jwt-decode";
 import { useSelector} from "react-redux";
 import { Navigate } from "react-router-dom";
-import { getProfileData } from "../Services/ProfileService";
-import { useState } from "react";
 
 interface PublicRouteProps{
   children: JSX.Element
@@ -17,7 +14,8 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 
   if ((token)) {
     if (user) {
-      return <Navigate to={path} />
+      if (role == "admin") return <Navigate to={"/admin/dashboard"}/>
+      else return <Navigate to={path} />
     }
     else return children;
   }

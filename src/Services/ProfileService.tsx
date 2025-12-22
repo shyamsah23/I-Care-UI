@@ -29,4 +29,17 @@ export const getProfileData = async (id: any, user: any,token:any) => {
     });
 };
 
+export const getAllDoctors_Patients = async (type: string,token:any) => {
+  return axiosInstance
+    .get(`/profile/${type}/all-${type}s`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
 export default updateProfile;

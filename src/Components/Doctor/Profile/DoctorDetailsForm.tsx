@@ -11,11 +11,15 @@ import {
 } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import updateProfile, { getProfileData } from "../../Services/ProfileService";
+import updateProfile, { getProfileData } from "../../../Services/ProfileService";
 import {
   errorNotification,
   successNotification,
-} from "../../Utility/NotificationUtility";
+} from "../../../Utility/NotificationUtility";
+
+import { useNavigate } from "react-router-dom";
+import { addProfileDetails } from "../../../Slices/ProfileSlice";
+import { departmentOptions } from "../../../utils/Constants";
 import {
   COLORS,
   baseInputStyle,
@@ -28,10 +32,7 @@ import {
   rowStyle,
   colStyle,
   selectStyle,
-} from "./PredefinedCSS";
-import { useNavigate } from "react-router-dom";
-import { addProfileDetails } from "../../Slices/ProfileSlice";
-import { departmentOptions } from "../../utils/Constants";
+} from "../../../utils/PredefinedCSS";
 
 export default function DoctorProfileForm() {
   const token = useSelector((state: any) => state.jwtSlice).toString();

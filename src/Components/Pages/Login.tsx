@@ -16,7 +16,7 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const HandleSubmit = async (e) => {
+  const HandleSubmit = async (e:any) => {
     e.preventDefault();
 
     try {
@@ -32,11 +32,11 @@ export default function Login() {
       console.log("Login success:", response);
 
       const profile = await getProfileData(user?.profileId, user,token);
-      if (profile.phone != null) {
+      if (profile.phone != null||user?.role.toLowerCase()=="admin") {
         dispatch(addProfileDetails(profile));
         navigate("/");
       }
-      else navigate(`/profile/${user?.role}`)
+      else navigate(`/profile/${user?.role.toLowerCase()}`)
     } catch (error) {
       errorNotification(error?.response?.data?.errorMessage);
       console.error("Login error:", error);
