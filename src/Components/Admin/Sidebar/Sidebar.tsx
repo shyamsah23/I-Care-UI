@@ -1,26 +1,31 @@
 import { ActionIcon, Avatar, Text } from '@mantine/core';
-import { IconCalendarCheck, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconStethoscope } from '@tabler/icons-react';
+import { IconBox, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconReportMoney, IconStethoscope, IconUser } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const links = [
   {
-    name:"Dashboard",url:"/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
+    name:"Dashboard",url:"admin/dashboard",icon:<IconLayoutGrid stroke={1.5}/>
   },
   {
-    name:"Doctors",url:"/doctors" ,icon:<IconStethoscope stroke={1.5}/>
+    name:"Patients",url:"admin/patients",icon:<IconEmergencyBed stroke={1.5}/>
   },
   {
-    name:"Patient",url:"/patients",icon:<IconEmergencyBed stroke={1.5}/>
+    name:"Doctors",url:"admin/doctors",icon:<IconStethoscope stroke={1.5}/>
   },
   {
-    name:"Appointments",url:"/appointments",icon:<IconCalendarCheck stroke={1.5}/>
+    name:"Pharmacy",url:"admin/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
   },
   {
-    name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
+    name:"Inventory",url:"admin/inventory",icon:<IconBox stroke={1.5}/>
   },
+  {
+    name:"Sales",url:"admin/sales",icon:<IconReportMoney stroke={1.5}/>
+  }
 ]
-const Sidebar = () => {
+
+const AdminSidebar = () => {
+  const navigate = useNavigate();
   const userDetails = useSelector((state: any) => state.userSlice);
   return (
     <aside
@@ -42,7 +47,7 @@ const Sidebar = () => {
       "
     >
       {/* Brand */}
-      <div className="flex items-center gap-3 md:justify-start justify-center">
+      <div className="flex items-center gap-3 md:justify-start justify-center" >
         <ActionIcon
           variant="transparent"
           size="xl"
@@ -63,7 +68,7 @@ const Sidebar = () => {
           />
         </ActionIcon>
 
-        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100">
+        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100" onClick={()=>navigate("doctor/home")}>
           I-Care
         </span>
       </div>
@@ -132,4 +137,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

@@ -1,7 +1,7 @@
 import { ActionIcon, Avatar, Text } from '@mantine/core';
 import { IconCalendarCheck, IconEmergencyBed, IconHeartbeat, IconLayoutGrid, IconMedicineSyrup, IconStethoscope, IconUser } from '@tabler/icons-react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const links = [
   {
@@ -11,13 +11,18 @@ const links = [
     name:"Profile",url:"doctor/profile" ,icon:<IconUser stroke={1.5}/>
   },
   {
-    name:"Appointments",url:"doctor/appointments",icon:<IconCalendarCheck stroke={1.5}/>
+    name:"Patients",url:"/pharmacy",icon:<IconEmergencyBed stroke={1.5}/>
   },
   {
-    name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
+    name:"Appointments",url:"doctor/appointments",icon:<IconCalendarCheck stroke={1.5}/>
   },
+  // {
+  //   name:"Pharmacy",url:"/pharmacy",icon:<IconMedicineSyrup stroke={1.5}/>
+  // }
 ]
+
 const DoctorSidebar = () => {
+  const navigate = useNavigate();
   const userDetails = useSelector((state: any) => state.userSlice);
   return (
     <aside
@@ -39,7 +44,7 @@ const DoctorSidebar = () => {
       "
     >
       {/* Brand */}
-      <div className="flex items-center gap-3 md:justify-start justify-center">
+      <div className="flex items-center gap-3 md:justify-start justify-center" >
         <ActionIcon
           variant="transparent"
           size="xl"
@@ -60,7 +65,7 @@ const DoctorSidebar = () => {
           />
         </ActionIcon>
 
-        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100">
+        <span className="font-heading text-3xl font-semibold tracking-wide text-emerald-100" onClick={()=>navigate("doctor/home")}>
           I-Care
         </span>
       </div>

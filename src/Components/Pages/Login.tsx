@@ -4,7 +4,6 @@ import { data, Link, Navigate, useNavigate } from "react-router-dom";
 import loginUser from "../../Services/UserService";
 import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
 import { useDispatch, useSelector } from "react-redux";
-// import { addJWTToken, deleteJWTToken } from "../../Slices/JwtSlice";
 import { addJWTToken, deleteJWTToken } from "../../Slices/AuthSlice";
 import { jwtDecode } from 'jwt-decode';
 import { addUserDetails } from "../../Slices/UserSlice";
@@ -16,8 +15,8 @@ export default function Login() {
   const [userData, setUserData] = useState({ username: "", password: ""});
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  const HandleSubmit = async (e) => {
+
+  const HandleSubmit = async (e:any) => {
     e.preventDefault();
 
     try {
@@ -30,14 +29,14 @@ export default function Login() {
       successNotification("Logged in Successfully");
       dispatch(addJWTToken(response?.jwtToken));
       dispatch(addUserDetails(jwtDecode(response?.jwtToken)));
-      // console.log("User",jwtDecode(response.jwtToken));
       console.log("Login success:", response);
-      // console.log("details being pushed", user?.profileId, user,token);
+
       const profile = await getProfileData(user?.profileId, user,token);
-      // console.log("profile_data", profile);
-      if (profile.phone != null) {
+      if (profile.phone != null||user?.role.toLowerCase()=="admin") {
         dispatch(addProfileDetails(profile));
-      } navigate("/");
+        navigate("/");
+      }
+      else navigate(`/profile/${user?.role.toLowerCase()}`)
     } catch (error) {
       errorNotification(error?.response?.data?.errorMessage);
       console.error("Login error:", error);

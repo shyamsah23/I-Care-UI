@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useState } from "react";
 import {
   Button,
   Checkbox,
@@ -11,8 +11,8 @@ import {
 } from "@mantine/core"
 import { Link} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import updateProfile, { getProfileData } from "../../Services/ProfileService";
-import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
+import updateProfile, { getProfileData } from "../../../Services/ProfileService";
+import { errorNotification, successNotification } from "../../../Utility/NotificationUtility";
 import {
   COLORS,
   baseInputStyle,
@@ -25,10 +25,10 @@ import {
   rowStyle,
   colStyle,
   selectStyle
-} from "./PredefinedCSS";
-import { bloodGroupOptions } from "../../utils/Constants";
+} from "../../../utils/PredefinedCSS";
+import { bloodGroupOptions } from "../../../utils/Constants";
 import { useNavigate } from "react-router-dom";
-import { addProfileDetails } from "../../Slices/ProfileSlice";
+import { addProfileDetails } from "../../../Slices/ProfileSlice";
 
 export default function PatientProfileForm() {
   const token = useSelector((state: any) => state.jwtSlice).toString();
@@ -49,7 +49,7 @@ export default function PatientProfileForm() {
 
   const [submitting, setSubmitting] = useState(false);
 
-  const [errors, setErrors] = useState<{ phone?: string; aadhaarNo?: string }>({});
+  const [errors, setErrors] = useState<{ phone?: string; aadhaarNo?: string; dob?: string }>({});
 
   function validatePhone(phone?: string) {
     if (!phone) return "Phone is required";
@@ -63,49 +63,9 @@ export default function PatientProfileForm() {
     if (!/^\d{12}$/.test(digits)) return "Aadhaar must be 12 digits";
     return undefined;
   }
-
-  const HandleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const phoneErr = validatePhone(profileData.phone);
-    const aadhaarErr = validateAadhaar(profileData.aadhaarNo);
-
-    if (phoneErr || aadhaarErr)
-      errorNotification("Please enter correct details");
-    setErrors({ phone: phoneErr, aadhaarNo: aadhaarErr });
-    
-    const payload = {
-      id: profileData.id,
-      name: profileData.name,
-      email: profileData.email,
-      dob: profileData.dob,
-      phone: profileData.phone,
-      address: profileData.address,
-      aadhaarNo: profileData.aadhaarNo,
-      bloodGroup: profileData.bloodGroup,
-    };
-
-    try {
-      console.log("payload", payload);
-      await updateProfile(payload, token,user);
-      setSubmitting(true);
-      dispatch(addProfileDetails(payload));
-      // console.log("Profile created:", response);
-      successNotification("Profile Created Successfully");
-      navigate("/");
-    } catch (error: any) {
-      // console.error("Profile creation error:", error);
-      errorNotification(
-        error?.response?.data?.errorMessage || "Failed to save profile"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+  
   function validateDob(dob?: string) {
     if (!dob) return "DOB is required";
-    // format YYYY-MM-DD
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return "Use format YYYY-MM-DD";
     const parts = dob.split("-");
     const year = Number(parts[0]);
@@ -125,6 +85,46 @@ export default function PatientProfileForm() {
     return "";
   }
 
+  const HandleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const phoneErr = validatePhone(profileData.phone);
+    const aadhaarErr = validateAadhaar(profileData.aadhaarNo);
+    const DobErr = validateDob(profileData.dob);
+
+    if (phoneErr || aadhaarErr)
+      errorNotification("Please enter correct details");
+    setErrors({ phone: phoneErr, aadhaarNo: aadhaarErr, dob:DobErr});
+    
+    const payload = {
+      id: profileData.id,
+      name: profileData.name,
+      email: profileData.email,
+      dob: profileData.dob,
+      phone: profileData.phone,
+      address: profileData.address,
+      aadhaarNo: profileData.aadhaarNo,
+      bloodGroup: profileData.bloodGroup,
+    };
+ 
+    try {
+      console.log("payload", payload);
+      await updateProfile(payload, token,user);
+      setSubmitting(true);
+      dispatch(addProfileDetails(payload));
+      console.log("Profile created:");
+      successNotification("Profile Created Successfully");
+      navigate("/");
+    } catch (error: any) {
+      console.error("Profile creation error:", error);
+      errorNotification(
+        error?.response?.data?.errorMessage || "Failed to save profile"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -141,7 +141,6 @@ export default function PatientProfileForm() {
         position: "relative",
       }}
     >
-      {/* Dark overlay */}
       <div
         style={{
           position: "absolute",
@@ -167,7 +166,6 @@ export default function PatientProfileForm() {
         </Stack>
 
         <Stack spacing="sm">
-          {/* DOB + Phone */}
           <div style={rowStyle}>
             <div style={colStyle}>
               <label style={labelStyle}>Date of Birth (YYYY-MM-DD)</label>
@@ -214,7 +212,6 @@ export default function PatientProfileForm() {
             </div>
           </div>
 
-          {/* Aadhaar + Blood */}
           <div style={rowStyle}>
             <div style={colStyle}>
               <label style={labelStyle}>Aadhaar number</label>
@@ -258,7 +255,6 @@ export default function PatientProfileForm() {
             </div>
           </div>
 
-          {/* Address */}
           <div>
             <label style={labelStyle}>Address</label>
             <textarea
@@ -275,7 +271,6 @@ export default function PatientProfileForm() {
             />
           </div>
 
-          {/* Save + note */}
           <Group position="apart" style={{ marginTop: 6 }}>
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Checkbox checked={false} onChange={() => {}} />
@@ -285,7 +280,6 @@ export default function PatientProfileForm() {
             </div>
           </Group>
 
-          {/* Submit */}
           <Stack spacing="sm" style={{ marginBottom: 12, alignItems: "center" }}>
             <Button
               type="submit"
