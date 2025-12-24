@@ -1,4 +1,3 @@
-import { error } from "console";
 import axiosInstance from "../Interceptor/AxiosInterceptor";
 
 const getTodayAppointmentByDoctorId = (doctorId: number , token: String) =>  {

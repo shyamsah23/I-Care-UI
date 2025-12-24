@@ -46,7 +46,7 @@ export const appRouter = createBrowserRouter([
           },
           {
             path: "appointments",
-            element: <PatientAppointment/>
+            element: <Appointments/>
           }
         ]
       },

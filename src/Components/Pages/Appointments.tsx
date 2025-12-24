@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button, Container, Title, Stack, Loader, Center } from "@mantine/core";
 import { useSelector } from "react-redux";
 import getTodayAppointmentByDoctorId from "../../Services/AppointmentService";
-import { jwtDecode } from "jwt-decode";
 import AppointmentList from "../Doctor/AppointmentDetails/AppointmentList";
 
 
@@ -10,8 +9,8 @@ const Appointments = () => {
 
   const [appointment,setAppointment]=useState([]);
   const [loading,setLoading] = useState(false);
-  const token = useSelector((state) => state.jwtSlice);
-  const user = useSelector((state) => state.userSlice);
+  const token = useSelector((state:any) => state.jwtSlice);
+  const user = useSelector((state:any) => state.userSlice);
   const userId = user?.decode?.userId;
   const handleGetTodayAppointments =  async () => {
     console.log("Button Clicked");
