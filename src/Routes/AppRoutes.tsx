@@ -46,9 +46,9 @@ export const appRouter = createBrowserRouter([
           },
           {
             path: "appointments",
-            element: <Appointments />,
-          },
-        ],
+            element: <PatientAppointment/>
+          }
+        ]
       },
       {
         path: "doctor/",
