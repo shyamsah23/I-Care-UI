@@ -179,8 +179,7 @@ export default function Signup() {
               data={[
                 { value: "DOCTOR", label: "Doctor" },
                 { value: "PATIENT", label: "Patient" },
-                { value: "ADMIN", label: "Admin" },
-                // { value: "PHARMACIST", label: "Pharmacist" },
+                // { value: "ADMIN", label: "Admin" },
               ]}
               value={userData.role}
               onChange={(roleChosen) =>

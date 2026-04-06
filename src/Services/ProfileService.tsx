@@ -29,6 +29,19 @@ export const getProfileData = async (id: any, user: any,token:any) => {
     });
 };
 
+export const GetProfileDataByEmail = async (email: string, userRole: any, token: any)=>{
+  return axiosInstance
+    .get(`/profile/${userRole}/get/email/${email}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
+};
+
 export const getAllDoctors_Patients = async (type: string,token:any) => {
   return axiosInstance
     .get(`/profile/${type}/all-${type}s`, {

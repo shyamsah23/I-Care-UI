@@ -9,6 +9,8 @@ import { jwtDecode } from 'jwt-decode';
 import { addUserDetails } from "../../Slices/UserSlice";
 import { getProfileData } from "../../Services/ProfileService";
 import { addProfileDetails } from "../../Slices/ProfileSlice";
+import { addNotification } from "../../Slices/NotificationSlice";
+import axios from "axios";
 
 export default function Login() {
  
@@ -16,7 +18,7 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const HandleSubmit = async (e:any) => {
+  const HandleSubmit = async (e: any) => {
     e.preventDefault();
 
     try {
@@ -24,24 +26,45 @@ export default function Login() {
         username: userData.username,
         password: userData.password,
       });
-      const token = response?.jwtToken;
-      const user = jwtDecode(token);
-      successNotification("Logged in Successfully");
-      dispatch(addJWTToken(response?.jwtToken));
-      dispatch(addUserDetails(jwtDecode(response?.jwtToken)));
-      console.log("Login success:", response);
 
-      const profile = await getProfileData(user?.profileId, user,token);
-      if (profile.phone != null||user?.role.toLowerCase()=="admin") {
-        dispatch(addProfileDetails(profile));
-        navigate("/");
+      const token = response?.jwtToken;
+
+      if (!token) {
+        throw new Error("Token not received");
       }
-      else navigate(`/profile/${user?.role.toLowerCase()}`)
-    } catch (error) {
-      errorNotification(error?.response?.data?.errorMessage);
+
+      const decoded: any = jwtDecode(token);
+      const role = decoded?.role?.toLowerCase();
+
+      successNotification("Logged in Successfully");
+      dispatch(
+        addNotification({
+          message: "Login successful",
+          type: "success",
+        }),
+      );
+
+      dispatch(addJWTToken(token));
+      dispatch(addUserDetails(decoded));
+
+      const profile = await getProfileData(decoded?.profileId, decoded, token);
+
+      dispatch(addProfileDetails(profile));
+      
+      if (role === "admin") {
+        navigate("/admin");
+        return;
+      }
+
+      if (profile?.phone) {
+        navigate(`/${role}`);
+      } else {
+        navigate(`/profile/${role}`);
+      }
+    } catch (error: any) {
+      errorNotification(error?.response?.data?.errorMessage || "Login failed");
       console.error("Login error:", error);
     }
-
   };
 
   return (
@@ -57,7 +80,7 @@ export default function Login() {
         alignItems: "center",
         justifyContent: "center",
         padding: "1rem",
-        position: "relative fixed",
+        position: "fixed",
       }}
     >
       {/* Dark overlay */}
@@ -69,7 +92,7 @@ export default function Login() {
           backdropFilter: "blur(4px)",
         }}
       />
-     
+
       <Paper
         component="form"
         onSubmit={HandleSubmit}
@@ -82,7 +105,7 @@ export default function Login() {
           zIndex: 1,
           maxWidth: 420,
           width: "100%",
-          backgroundColor: "rgba(15,23,42,0.92)", // slate-900-ish
+          backgroundColor: "rgba(15,23,42,0.92)",
           borderColor: "rgba(16,185,129,0.6)",
           // emerald border
         }}
@@ -104,7 +127,7 @@ export default function Login() {
             required
             value={userData.username}
             onChange={(e) =>
-              setUserData((c)=>({ ...c, username: e.target.value }))
+              setUserData((c) => ({ ...c, username: e.target.value }))
             }
             radius="md"
             styles={{
@@ -121,7 +144,7 @@ export default function Login() {
             required
             value={userData.password}
             onChange={(e) =>
-              setUserData((c)=>({ ...c, password: e.target.value }))
+              setUserData((c) => ({ ...c, password: e.target.value }))
             }
             radius="md"
             styles={{
@@ -133,12 +156,7 @@ export default function Login() {
           />
 
           <Group justify="space-between" mt="xs">
-            <Checkbox
-              label="Remember me"
-              // checked={form.remember}
-              // onChange={handleChange("remember")}
-              color="teal"
-            />
+            <Checkbox label="Remember me" color="teal" />
             <Button
               variant="subtle"
               size="compact-xs"
@@ -146,6 +164,7 @@ export default function Login() {
               px={0}
               styles={{ root: { fontWeight: 400 } }}
               type="button"
+              onClick={()=>navigate('/forgot-password')}
             >
               Forgot password?
             </Button>

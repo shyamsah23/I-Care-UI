@@ -13,17 +13,17 @@ export const getAllMedicines = async (token: any) => {
     });
 };
 
-export const addMedicine = async (token: any,medicine:any) => {
+export const addMedicine = async (token: any, medicine: any) => {
   return axiosInstance
-      .post("/pharmacy/medicines/add", medicine, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response: any) => response.data)
-      .catch((error: any) => {
-        throw error;
-      });
+    .post("/pharmacy/medicines/add", medicine, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response: any) => response.data)
+    .catch((error: any) => {
+      throw error;
+    });
 };
 
 export const updateMedicine = async (token: any, medicine: any) => {
@@ -117,7 +117,7 @@ export const updateSales = async (token: any, sales: any) => {
     });
 };
 
-export const getAllSalesItemBySaleId = async (token: any, saleId:number) => {
+export const getAllSalesItemBySaleId = async (token: any, saleId: number) => {
   return axiosInstance
     .get(`/pharmacy/sales/saleItem/getBySaleId/${saleId}`, {
       headers: {
@@ -128,4 +128,27 @@ export const getAllSalesItemBySaleId = async (token: any, saleId:number) => {
     .catch((error: any) => {
       throw error;
     });
+};
+
+export const createMultipleSaleItem = async (token: any, saleItems: any[]) => {
+  if (!saleItems || saleItems.length === 0) {
+    throw new Error("Sale items cannot be empty");
+  }
+
+  try {
+    const response = await axiosInstance.post(
+      "/pharmacy/sales/saleItem/createMultiple",
+      saleItems,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", 
+        },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("CREATE SALE ITEMS ERROR:", error);
+    throw error;
+  }
 };

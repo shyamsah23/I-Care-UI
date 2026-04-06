@@ -18,4 +18,21 @@ export const signupUser = async (user: any) => {
     });
 };
 
+export const forgotPassword = async (email: string) => {
+  return axiosInstance.post("/auth/user/forgot-password", {
+    email: email,
+  });
+}
+
+export const resetPassword = async (token:any,password:any) => {
+  axiosInstance.post(
+    `/auth/user/reset-password?token=${token}`,
+    password,
+    {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    },
+  );
+};
 export default loginUser;

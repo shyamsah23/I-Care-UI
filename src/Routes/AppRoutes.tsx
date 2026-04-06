@@ -1,23 +1,34 @@
 import { createBrowserRouter, Outlet} from 'react-router-dom';
 import Error from '../Components/Pages/Error';
-import Appointments from '../Components/Pages/Appointments';
 import Signup from '../Components/Pages/Signup';
 import Login from '../Components/Pages/Login';
 import PublicRoute from './PublicRoute';
 import ProtectedRoute from './ProtectedRoute';
 import App from '../App';
-import PatientDashboard from '../Components/Layout/PatientDashboard';
-import DoctorDashboard from '../Components/Layout/DoctorDashboard';
-import DoctorProfile from '../Components/Doctor/Profile/Profile';
-import PatientProfile from '../Components/Patient/Profile/Profile';
+import PatientDashboard from '../Components/RoleBasedPages/Patient/Dashboard/PatientDashboard';
+import DoctorDashboard from '../Components/RoleBasedPages/Doctor/Dashboard/DoctorDashboard';
+import DoctorProfile from '../Components/RoleBasedPages/Doctor/Profile/Profile';
+import PatientProfile from "../Components/RoleBasedPages/Patient/Profile/Profile";
 import HomePage from '../Components/Pages/HomePage';
-import AdminDashboard from '../Components/Layout/AdminDashboard';
-import { Pharmacy } from '../Components/Admin/Pharmacy/Pharmacy';
-import PatientProfileForm from '../Components/Patient/Profile/PatientDetailsForm';
-import DoctorProfileForm from '../Components/Doctor/Profile/DoctorDetailsForm';
-import Inventory from '../Components/Admin/Inventory/Inventory';
-import Sales from '../Components/Admin/Sales/Sales';
-import { GetAllDoctors_Patients } from '../Components/Admin/GetAllDoctors_Patients';
+import AdminDashboard from '../Components/RoleBasedPages/Admin/Dashboard/AdminDashboard';
+import { Pharmacy } from "../Components/RoleBasedPages/Admin/Pharmacy/Pharmacy";
+import PatientProfileForm from "../Components/RoleBasedPages/Patient/Profile/PatientDetailsForm";
+import DoctorProfileForm from "../Components/RoleBasedPages/Doctor/Profile/DoctorDetailsForm";
+import Inventory from "../Components/RoleBasedPages/Admin/Inventory/Inventory";
+import Sales from "../Components/RoleBasedPages/Admin/Sales/Sales";
+import { GetAllDoctors_Patients } from "../Components/RoleBasedPages/Admin/GetAllDoctors_Patients";
+import PatientAppointments from "../Components/RoleBasedPages/Patient/AppointmentDetails.tsx/PatientAppointments";
+import DoctorAppointments from "../Components/RoleBasedPages/Doctor/AppointmentDetails.tsx/DoctorAppointments";
+import AdminAppointments from "../Components/RoleBasedPages/Admin/Appointments/AdminAppointments";
+import { DoctorPharmacy } from "../Components/RoleBasedPages/Doctor/Pharmacy/DoctorPharmacy";
+import Prescription from '../Components/Pages/Prescription';
+import { PatientPharmacy } from "../Components/RoleBasedPages/Patient/Pharmacy/PatientPharmacy";
+import { Cart } from '../Components/Pages/Cart';
+import { PaymentPage } from '../Components/Pages/PaymentPage';
+import ResetPassword from '../Components/Pages/PasswordResetPage';
+import ForgotPassword from '../Components/Pages/ForgotPasswordPage';
+import RoleRedirect from './DashboardRouting';
+import PatientOrderHistory from '../Components/Pages/OrderHistory';
 
 export const appRouter = createBrowserRouter([
   {
@@ -29,16 +40,20 @@ export const appRouter = createBrowserRouter([
     ),
     children: [
       {
-        path: "patient/",
-        element: <Outlet />,
+        path: "",
+        element: <RoleRedirect />,
+      },
+      {
+        path: "patient",
+        element: (
+          <ProtectedRoute>
+            <Outlet />
+          </ProtectedRoute>
+        ),
         children: [
           {
-            path: "dashboard",
+            path: "",
             element: <PatientDashboard />,
-          },
-          {
-            path: "home",
-            element: <HomePage />,
           },
           {
             path: "profile",
@@ -46,43 +61,79 @@ export const appRouter = createBrowserRouter([
           },
           {
             path: "appointments",
-            element: <Appointments />,
+            element: <PatientAppointments />,
+          },
+          {
+            path: "prescriptions",
+            element: <Prescription role="PATIENT" />,
+          },
+          {
+            path: "listOfDoctors",
+            element: <GetAllDoctors_Patients type="doctor" />,
+          },
+          {
+            path: "pharmacy",
+            element: <PatientPharmacy />,
+          },
+          {
+            path: "cart",
+            element: <Cart />,
+          },
+          {
+            path: "payment",
+            element: <PaymentPage />,
+          },
+          {
+            path: "order-history",
+            element: <PatientOrderHistory />,
           },
         ],
       },
       {
-        path: "doctor/",
-        element: <Outlet />,
+        path: "doctor",
+        element: (
+          <ProtectedRoute>
+            <Outlet />
+          </ProtectedRoute>
+        ),
         children: [
           {
-            path: "dashboard",
+            path: "",
             element: <DoctorDashboard />,
-          },
-          {
-            path: "home",
-            element: <HomePage />,
           },
           {
             path: "profile",
             element: <DoctorProfile />,
           },
           {
+            path: "pharmacy",
+            element: <DoctorPharmacy />,
+          },
+          {
             path: "appointments",
-            element: <Appointments />,
+            element: <DoctorAppointments />,
+          },
+          {
+            path: "prescriptions",
+            element: <Prescription role="DOCTOR" />,
+          },
+          {
+            path: "ListOfPatients",
+            element: <GetAllDoctors_Patients type="patient" />,
           },
         ],
       },
       {
-        path: "admin/",
-        element: <Outlet />,
+        path: "admin",
+        element: (
+          <ProtectedRoute>
+            <Outlet />
+          </ProtectedRoute>
+        ),
         children: [
           {
-            path: "dashboard",
+            path: "",
             element: <AdminDashboard />,
-          },
-          {
-            path: "home",
-            element: <HomePage />,
           },
           {
             path: "doctors",
@@ -91,6 +142,10 @@ export const appRouter = createBrowserRouter([
           {
             path: "patients",
             element: <GetAllDoctors_Patients type="patient" />,
+          },
+          {
+            path: "appointments",
+            element: <AdminAppointments />,
           },
           {
             path: "pharmacy",
@@ -103,7 +158,11 @@ export const appRouter = createBrowserRouter([
           {
             path: "sales",
             element: <Sales />,
-          }
+          },
+          {
+            path: "prescriptions",
+            element: <Prescription role="ADMIN" />,
+          },
         ],
       },
     ],
@@ -118,10 +177,26 @@ export const appRouter = createBrowserRouter([
     ),
   },
   {
+    path: "/reset-password",
+    element: (
+      <PublicRoute>
+        <ResetPassword />
+      </PublicRoute>
+    ),
+  },
+  {
     path: "/login",
     element: (
       <PublicRoute>
         <Login />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/forgot-password",
+    element: (
+      <PublicRoute>
+        <ForgotPassword />
       </PublicRoute>
     ),
   },

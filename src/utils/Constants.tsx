@@ -24,3 +24,6 @@ export const departmentOptions = [
   { value: "Ophthalmology", label: "Ophthalmology" },
   { value: "ENT", label: "ENT" },
 ];
+
+export const Razorpay_key = 'rzp_test_rB3BFtkVF707Uc';
+
