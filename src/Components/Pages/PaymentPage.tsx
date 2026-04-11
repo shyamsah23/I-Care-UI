@@ -1,12 +1,9 @@
 import { Button, Card, Text, Loader, Center } from "@mantine/core";
 import { clearCart } from "../../Slices/CartSlice";
-import { createMultipleSaleItem, createSales } from "../../Services/PharmacyService";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { errorNotification, successNotification } from "../../Utility/NotificationUtility";
 import { useDispatch, useSelector } from "react-redux";
-import { Razorpay_key } from "../../utils/SecurityKeys";
 import { useLocation, useNavigate } from "react-router-dom";
-import { setPrescription } from "../../Slices/PrescriptionSlice";
 import axiosInstance from "../../Interceptor/AxiosInterceptor";
 
 export const PaymentPage = () => {
@@ -45,7 +42,7 @@ export const PaymentPage = () => {
     }
 
     const options = {
-      key: Razorpay_key,
+      key: import.meta.env.Razorpay_key,
       amount: total * 100,
       currency: "INR",
       name: "I-Care",
@@ -72,13 +69,13 @@ export const PaymentPage = () => {
             // appointment
             appointmentData: appointmentData,
           };
-          
+
           if (paymentType === "APPOINTMENT" && !appointmentData) {
             errorNotification("Appointment data missing");
             return;
           }
 
-          console.log("VERIFY PAYLOAD:", verifyPayload); 
+          console.log("VERIFY PAYLOAD:", verifyPayload);
 
           await axiosInstance.post(
             "/appointment/payment/verify-and-process",
